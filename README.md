@@ -15,5 +15,16 @@ torchvision faster-rcnn例子修改版，考虑到目前大部分目标检测任
 ├── trainvaltest
 └── val
 ```
-Pascal VOC， YOLO， CSV， TXT， COCO等格式的数据集相互转换脚本见笔者的另一个库：https://github.com/ouening/OD_dataset_conversion_scripts
+Pascal VOC， YOLO， CSV， TXT， COCO等格式的数据集相互转换脚本见笔者的另一个库：
+https://github.com/ouening/OD_dataset_conversion_scripts
+
+简单的训练命令为：
+```
+python3 train.py --data-path /media/gaoya/disk/Datasets/ObjectDetection/输电线路缺陷/CotterPin2classes/CocoFormat \
+--dataset coco \
+--num-classes  8 \
+--batch-size 4 \
+--epochs 50
+```
+还有其他参数可以自行查看train.py源码。
 
