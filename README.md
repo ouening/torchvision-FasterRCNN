@@ -20,7 +20,7 @@ https://github.com/ouening/OD_dataset_conversion_scripts
 
 简单的训练命令为：
 ```
-python3 train.py --data-path /media/gaoya/disk/Datasets/ObjectDetection/输电线路缺陷/CotterPin2classes/CocoFormat \
+python3 train.py --data-path /path/to/CocoFormat \
 --dataset coco \
 --num-classes  8 \
 --batch-size 4 \
