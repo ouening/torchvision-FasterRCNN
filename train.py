@@ -71,17 +71,18 @@ def get_mobilnet_v2_model_FRCNN(num_classes):
 	'''
     backbone = torchvision.models.mobilenet_v2(pretrained=True).features
     backbone.out_channels = 1280
-    # anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),),
-                                # aspect_ratios=((0.5, 1.0, 2.0),))
-    anchor_generator = AnchorGenerator(sizes=((8, 16, 32, 64, 128, 256, 512),),
-								aspect_ratios=((0.5, 1.0, 1,5, 2.0),))
+    anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),),
+                                aspect_ratios=((0.5, 1.0, 2.0),))
+    # anchor_generator = AnchorGenerator(sizes=((8, 16, 32, 64, 128, 256, 512),),
+	# 							aspect_ratios=((0.5, 1.0, 1,5, 2.0),))
     roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=[0],
 													output_size=7,
 													sampling_ratio=2)
     model = torchvision.models.detection.faster_rcnn.FasterRCNN(backbone,
 					num_classes,
 					rpn_anchor_generator=anchor_generator,
-					box_roi_pool=roi_pooler)
+					box_roi_pool=roi_pooler
+                    )
 
     return  model
 
@@ -92,10 +93,10 @@ def get_squeezenet1_0_model_FRCNN(num_classes):
     backbone = torchvision.models.squeezenet1_0(pretrained=True).features
     # backbone = EfficientNet.from_pretrained('efficientnet-b7') 
     backbone.out_channels = 512
-    # anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),),
-                                # aspect_ratios=((0.5, 1.0, 2.0),))
-    anchor_generator = AnchorGenerator(sizes=((8, 16, 32, 64, 128, 256, 512),),
-								aspect_ratios=((0.5, 1.0, 1,5, 2.0),))
+    anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),),
+                                aspect_ratios=((0.5, 1.0, 2.0),))
+    # anchor_generator = AnchorGenerator(sizes=((8, 16, 32, 64, 128, 256, 512),),
+	# 							aspect_ratios=((0.5, 1.0, 1,5, 2.0),))
     roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=[0],
 													output_size=7,
 													sampling_ratio=2)
@@ -231,8 +232,8 @@ def main(args):
         collate_fn=utils.collate_fn)
 
     print("Creating model")
-    model = torchvision.models.detection.__dict__[args.model](num_classes=num_classes,
-                                                              pretrained=args.pretrained)
+    # model = torchvision.models.detection.__dict__[args.model](num_classes=num_classes,
+    #                                                           pretrained=args.pretrained)
     if args.model == 'resnet50':
         model = torchvision.models.detection.__dict__['fasterrcnn_resnet50_fpn'](num_classes=num_classes,
                                         pretrained=args.pretrained) # 默认backbone为fasterrcnn_resnet50_fpn
@@ -248,7 +249,8 @@ def main(args):
         model = get_mnasnet0_5_model_FRCNN(num_classes)
 
     model.to(device)
-
+    print(model)
+    
     model_without_ddp = model
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
@@ -301,12 +303,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=__doc__)
 
-    parser.add_argument('--data-path', default='/media/gaoya/disk/Datasets/ObjectDetection/TerahertzImages/YOLOAugumented/VOC2020/CocoFormat/', 
+    parser.add_argument('--data-path', default=r"D:\simpleod\YOLODataset\CocoDataset", 
                         help='dataset path')
     parser.add_argument('--dataset', default='coco', help='dataset')
-    parser.add_argument('--num-classes', required=True, help='number of classes in dataset')
-    parser.add_argument('--model', default='fasterrcnn_resnet50_fpn', 
-                        # help='model, options are fasterrcnn_resnet50_fpn,maskrcnn_resnet50_fpn')
+    parser.add_argument('--num-classes', default=3, required=False, help='number of classes in dataset')
+    parser.add_argument('--model', default='mobilenet_v2', 
                         help='backbone model of fasterrcnn, options are: \
                         resnet50,vgg16,mobilenet_v2,squeezenet1_0,alexnet,mnasnet0_5')
     parser.add_argument('--device', default='cuda', help='device')
